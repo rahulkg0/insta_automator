@@ -44,9 +44,6 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - FRONTEND_URL=http://localhost:3000
       - BACKEND_URL=http://localhost:8000
-      - META_APP_ID=1432606398769067
-      - META_APP_SECRET=07315d9bf1d139397ac12e8229d3ade6
-      - META_REDIRECT_URI=http://localhost:8000/api/v1/integrations/instagram/callback
     depends_on:
       postgres:
         condition: service_healthy
