@@ -18,12 +18,17 @@ class InstagramService:
     @staticmethod
     def get_auth_url(brand_id: str, user_id: str) -> Dict[str, Any]:
         """Generates Meta Graph API OAuth authorization URL or sandbox fallback."""
-        meta_app_id = os.getenv("META_APP_ID") or getattr(settings, "META_APP_ID", "")
+        meta_app_id = (os.getenv("META_APP_ID") or getattr(settings, "META_APP_ID", "")).strip()
         meta_redirect_uri = os.getenv("META_REDIRECT_URI") or getattr(settings, "META_REDIRECT_URI", f"{settings.BACKEND_URL}/api/v1/integrations/instagram/callback")
         state = f"{brand_id}:{user_id}"
 
-        if not meta_app_id or meta_app_id.strip() == "":
-            logger.info("META_APP_ID not configured; providing sandbox authorization URL.")
+        # Treat missing or default placeholder Meta App IDs as sandbox mock mode
+        is_placeholder = not meta_app_id or meta_app_id in (
+            "your_meta_app_id", "YOUR_META_APP_ID", "1234567890", "0000000000"
+        )
+
+        if is_placeholder:
+            logger.info(f"META_APP_ID '{meta_app_id}' is placeholder or unconfigured; providing sandbox authorization URL.")
             return {
                 "auth_url": f"{settings.FRONTEND_URL}/brands/{brand_id}?instagram_action=mock_connect",
                 "is_mock": True,
